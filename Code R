@@ -1,0 +1,1729 @@
+---
+title: "Devoir_marketing"
+author: "Sabaye Fried-Junior"
+header-includes:
+- \usepackage{fancyhdr}
+- \usepackage{lipsum}
+- \pagestyle{fancy}
+- \fancyhead[CO,CE]{}
+- \fancyfoot[L,L]{}
+fontsize: 12pt
+lang: 'fr'
+geometry: a4paper,top=2cm,bottom=2cm,left=2cm,right=2cm
+output: 
+   pdf_document :
+       toc : yes 
+       number_section : yes
+       highlight: "tango"
+
+---
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning=FALSE,message=FALSE,fig.pos = "!h",sanitize=TRUE,fig.align='center',strip.white = TRUE)
+```
+
+
+```{r}
+require(data.table)
+require(xtable)
+require(stargazer)
+require(ggplot2)
+library(readr)
+library(readr)
+library(kableExtra)
+library(tidyverse)
+library(funModeling)
+library(ggplot2)
+library(dplyr)
+library(data.table)
+library(lmtest)
+library(stargazer)
+library(psych)
+library(foreign)
+library(knitr)
+library(kableExtra)
+library(VIM)
+library(mice)
+library(data.table)
+library(tmap) 
+library(leaflet) 
+library(mapview)
+library(ggplot2)
+library(spData)
+library(maptools)
+library(readxl)
+library(tmaptools)
+library(tidyverse)
+library(funModeling)
+library(ggplot2)
+library(dplyr)
+library(data.table)
+library(lmtest)
+library(stargazer)
+library(psych)
+library(foreign)
+library(knitr)
+library(kableExtra)
+library(VIM)
+library(mice)
+library(data.table)
+library(tmap) 
+library(leaflet) 
+library(mapview)
+library(ggplot2)
+library(spData)
+library(maps)
+library(maptools)
+library(readxl)
+library(tmaptools)
+library(ggplot2)
+library(formattable)
+library(kableExtra)
+library(gridExtra)
+library(knitr)
+library(forcats)
+library(RGraphics)
+library(RColorBrewer)
+library(cowplot)
+library(gtable)
+library(ggpubr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(scales)
+library(factoextra)
+library(corrplot)
+library(FactoMineR)
+library(scales)
+library(fcuk)
+library(mosaic)
+library(lmtest)
+library(stargazer)
+library(popbio)
+library(boot)
+library(ROCR)
+library(corrplot)
+library(factoextra)
+library(FactoMineR)
+library(ggplot2)
+library(questionr)
+library(broom)
+library(GGally)
+library(caret)
+
+```
+\newpage 
+
+&nbsp; 
+
+&nbsp; 
+
+\begin{center}
+
+\begin{huge}
+\textbf{Préambule}
+\end{huge}
+
+
+\begin{large}
+\textbf{Contexte et problématique}
+\end{large}
+
+\end{center}
+
+&nbsp; 
+
+
+**Medicare** est un programme d’assurance maladie qui aide les personnes âgées à payer les services et les soins liés à leurs santés. Il est financé en partie par le gouvernement americain.
+Pour être admissible à **Medicare**  il faut remplir certaines conditions : être âgé(e) de plus de 65 ans si on a pas de handicap, être sous dialyse ou avoir reçu une transplantation, être atteint de la maladie de Charcot etc...
+
+**Medicare** couvre une multitude de services mais sous certaines conditions, telles que : les soins hospitaliers non ambulatoires, les soins palliatifs, les établissements de soins infirmiers spécialisés, les médicaments sur ordonnance et les divers soins à domicile. 
+
+Cependant **Medicare** ne paie pas la totalité des coûts. Un montant limite est fixé soit à l'ensemble des services, soit à des services en particulier. Au-dessus de ce montant les concernés payent eux même la différence.
+
+C’est pourquoi certains souscrivent à une assurance complémentaire, soit dans la même structure : **Medigap**, soit dans des sociétés privées et ce, afin de payer les services qui ne sont pas couverts par **Medicare**  et de les aider à couvrir les divers coûts qui ne sont pas couverts.  Aussi pour les aider à payer les soins de longues durées car ces derniers ne sont pas couverts par **Medicare**.
+
+Notons que cette assurance complémentaire est parfois fournie par le dernier employeur dans le cadre d’une prestation de retraite. Les personnes qui ont un faible revenu et qui remplissent certains critères peuvent avoir droit à une *pseudo* couverture complémentaire par le régime **Medicaid**, lui aussi financé par le gouvernement. 
+
+&nbsp; 
+
+Tous les individus de notre base de données bénéficient du programme **Medicare**, certains d'entre eux ont souscrit à la complémentaire santé : **Medigap** en plus de leur assurance et d'autres non. 
+
+L'objectif de notre étude sera d'essayer de déterminer les variables et/ou les combinaisons de variables qui expliquent ces faits. 
+
+Pour ce faire nous allons commencer par une analyse descriptive, puis nous construiront divers modèles basés sur la régression logistique, puis nous choisirons le meilleur d'entre eux et enfin, nous discuterons des résultats ainsi obtenus.
+
+
+
+
+\newpage 
+
+# Analyse descriptive 
+
+## Visualisation des données 
+
+\
+
+
+```{r}
+library(readr)
+data <- read_csv("HRS.csv")
+datamo <- read_delim("HRS copie.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+
+datamodif=datamo[,-1]
+```
+
+
+```{r}
+
+kable(data[c(1:10),-1],"latex",align = "c") %>%
+kable_styling(latex_options = c(" striped","scale_down"),
+              position="center",full_width = F)
+```
+
+Ce tableau ne contient que les 10 première lignes de notre base de données.
+&nbsp;
+
+
+
+
+## Description des variables
+
+\
+
+La base de données renseigne sur 20 informations corncernant 3206 individus. 
+\
+Ces dernières peuvent etre séparé comme suit : 
+
+$\bullet$ $\textbf{Variables renseignant sur l'état de santé}$ : 
+
+- *Excellent* : prend la valeur 1 si l'individu est en  exxcellente santé et 0 sinon; 
+
+- *vegood* : prend la valeur 1 si l'individu est en très bonne santé et 0 sinon; 
+
+- *good* : prend la valeur 1 si l'individu est en bonne santé et 0 sinon; 
+
+- *fair* : prend la valeur 1 si l'individu est plutot en bonne santé et 0 sinon;
+
+- *hstatusg* : variable qui renseigne sur l'autoévaluation de son état de santé, elleprend la valeur 1 si l'individu se pense en bonne santé et 0 sinon;
+
+
+\
+
+$\bullet$ \textbf{Les autres renseignant sur la signalitique des individus}
+
+- *hisp* : renseigne sur la race de la personne concerné, prend la valeur 1 si la personne est hispanique et à sinon;  
+
+- *white* : renseigne sur la race de la personne concerné, prend la valeur 1 si la personne est blanche et à sinon;
+- *married* : prend la valeur 1 si la personne est marrié et à sinon; 
+
+- *female* : prend la valeur 1 si l'individu est une femme et à si il s'agit d'un homme;
+
+- *retire* : prend la valeur 1 si l'individu est retraité et 0 sinon;
+
+- *sretire* : variable qui renseigne sur le statut de retraite du conjoint, prend la valeur 1 si le conjoint est assuré et  sinon;
+
+- *poor * : prend la valeur 1 si la personne est pauvre et 0 sinon; 
+
+$\bullet$ \textbf{Les variables quantitatives et qualitatives ordonées}
+
+- *age* : renseigne sur l'âge des personnes, qu'elles soient assurés ou non;
+
+- *educyear* : renseignent sur le nombre d'années d'éducation des personnes;
+
+- *hhincome* : renseignent sur le revenus des ménages;
+
+- *chronic* : renseigne sur le nombre total de maladies chroniques; il s'agit d'une variable quantitatives
+
+&nbsp;
+
+## Analyse des variables 
+
+
+$\bullet$ Commencons par étudier les variables relatives à la \textbf{signalitique des individus}: *female, white, hisp, married, retire, sretire * et *poor* . 
+
+- \textbf{Le sexe} :
+
+&nbsp; 
+
+&nbsp;
+
+```{r}
+data_non_assures<-data[data$ins==0,]
+data_assures<-data[data$ins==1,]
+
+datamodif_non_assures<-datamodif[datamodif$ins=="Non",]
+datamodif_assures<-datamodif[datamodif$ins=="Oui",]
+```
+
+```{r,fig.height=3,fig.width=4}
+ggplot(datamodif, aes(female,fill=ins)) +theme_grey()+xlab("Sexe")+ ylab("Nombre")+geom_bar(position = "dodge")+
+  scale_fill_brewer(palette="Paired")
+```
+
+
+
+```{r,fig.height=3}
+Femmes<-c(sum(data_assures$female==1),sum(data_non_assures$female==1))
+Hommes<-c(sum(data_assures$female==0),sum(data_non_assures$female==0))
+Situation<-c("Ayant une assurance complémentaire","Sans assurance complémentaire")
+
+table3<-cbind(Situation,Femmes,Hommes)
+
+kable(table3,align = "c",caption = "Statistiques concernant la race ") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F) %>%
+ add_header_above(c(" ", "Genre" = 2))
+
+#ss1<-tableGrob(table3)
+
+#grid.arrange(ss,ss1,ncol=2)
+
+
+```
+
+&nbsp; 
+
+Le nombre d'hommes et de femmes participant à l'étude n'est pas significativement different. Il y'a au total : 1532 femmes contre 1674 hommes. 
+Qu'il s'agissent des hommes ou des femmes, le nombre d'individu n'ayant pas d'assurance complémentaire est supérieur à celui qui en a une : 65,3% des femmes et 57,6% des hommes n'ont pas de complémentaire santé.
+
+
+&nbsp; 
+
+
+- \textbf{La race}: 
+
+Pour une meilleure compréhension visuelle et statistique, on fusionne les variables *hisp* et *white* pour mieux les representer. 
+
+Notons que certains individus sont à la fois Blanc et hispanic. On les appellera "Blanc et Hisp".
+Les "autres" sont les individus qui ne sont ni Blanc ni hispanic. 
+
+```{r,fig.height=3.5,fig.width=5}
+ggplot(datamodif, aes(race,fill=ins)) +theme_grey()+xlab("Race")+ylab("Nombre")+geom_bar(position = "dodge")+
+  scale_fill_brewer(palette="Paired")
+```
+
+```{r}
+White<-c(sum(datamodif_assures$race=="White"),sum(datamodif_non_assures$race=="White"))
+Autre<-c(sum(datamodif_assures$race=="Autre"),sum(datamodif_non_assures$race=="Autre"))
+Hispanic<-c(sum(datamodif_assures$race=="Hispanic"),sum(datamodif_non_assures$race=="Hispanic"))
+Blanc_et_Hisp<-c(sum(datamodif_assures$race=="Blanc et Hisp"),sum(datamodif_non_assures$race=="Blanc et Hisp"))
+
+Situation<-c("Ayant une assurance complémentaire","Sans assurance complémentaire")
+
+table4<-cbind(Situation,White,Autre,Hispanic,Blanc_et_Hisp)
+
+kable(table4,align = "c",caption = "Statistiques concernant le sexe ") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F) %>%
+  add_header_above(c(" ", "Race" = 4))
+```
+On constate que la majorité écrasante des individus enquétés sont de race blanche. Soit 75% du total des individus enquété. 57% d'entre eux n'ont pas de complémentaire santés. 
+
+On note aussi, a l'inverse, que l' effectif des hispanic participant à l'enquète est très faible. Ils ne représente que 1,15% du total des individus enquétés et l'immense majorité d'entre eux n'a pas de complémentaire santé. 
+
+Cependant on note qu'un nombre plus important est à la fois hispanic et blanc. Eux aussi, pour la plupart, n'ont pas de complémentaire santé
+
+Enfin, les autres, sont eux eux aussi, pour la plupart, n'ont pas de complémentaire santé.
+
+&nbsp;
+
+&nbsp;
+
+$\bullet$ Intéressons nous maintenant aux variables qui renseignent sur les situations dites \textbf{matrimoniale et socio-professionnelle} : 
+
+On s'interesse aux variables : *married et retire*. Qui pour la premiere renseigne sur la situation matrimoniale de l'individu : si il (elle) est marrié(e) ou non, la seconde sur la situation socio-professionnelle de l'individu : si il (elle) est acitif(ve) ou à la retraite.  
+
+\newpage
+
+```{r,fig.height=3,fig.width=9}
+bb1<-ggplot(datamodif, aes(married,fill=ins)) +theme_grey()+ylab("Nombre")+geom_bar(position = "dodge")+scale_fill_brewer(palette="Paired")
+bb2<-ggplot(datamodif, aes(retire,fill=ins)) +theme_grey()+ylab("Nombre")+geom_bar(position = "dodge")+
+  scale_fill_brewer(palette="Paired")
+bb2r<-ggplot(datamodif, aes(sretire,fill=ins)) +theme_grey()+ylab("Nombre")+geom_bar(position = "dodge")+
+  scale_fill_brewer(palette="Paired")
+
+ggarrange(bb1,bb2,ncol=2)
+```
+
+```{r}
+Marié<-c(sum(datamodif_assures$married=="Oui"),sum(datamodif_non_assures$married=="Oui"))
+Célibataire<-c(sum(datamodif_assures$married=="Non"),sum(datamodif_non_assures$married=="Non"))
+
+Retraité<-c(sum(datamodif_assures$retire=="Retraite"),sum(datamodif_non_assures$retire=="Retraite"))
+Actif<-c(sum(datamodif_assures$retire=="Actif"),sum(datamodif_non_assures$retire=="Actif"))
+
+
+vide<-c("","")
+
+Situation<-c("Ayant une assurance complémentaire","Sans assurance complémentaire")
+
+table5<-cbind(Situation,Marié,Célibataire,Retraité,Actif)
+
+kable(table5,align = "c",caption = "Statistiques concernant les divers situations ") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F) %>%
+  add_header_above(c(" ", "Matrimoniale" = 2,"Socio-professionnelle"=2))%>%
+  add_header_above(c(" ", "Situation" = 4))
+```
+
+&nbsp; 
+
+Grossièrement, on constate que la majorité des individus enquétés sont mariés et à la retraite.
+
+En ce qui concerne la situation matrimoniale : 73% des individus enquétés sont marriés et parmi ces derniers, 57% n'ont pas de complémentaire santé.
+
+Pour ce qui est de la situation socio-profésionnelle : 62,5% des personnes enquétés sont à la retraite et 58% d'entre eux n'ont pas de complémentaire santé.
+
+&nbsp; 
+
+
+$\bullet$ Passons aux variables qui renseigne sur \textbf{l'état de santé} : 
+
+Les variables concernés étant : *excellent, verygood, good, fair et poor*.
+
+
+```{r,fig.height=3.5,fig.width=5}
+ggplot(datamodif, aes(diagnostic,fill=ins)) +theme_grey()+xlab("État de santé")+ylab("Nombre")+geom_bar(position = "dodge")+
+  scale_fill_brewer(palette="Paired")+ scale_x_discrete(labels = c("poor","excellent","fair","good","verygood"))
+```
+
+```{r}
+Excellent<-c(sum(datamodif_assures$diagnostic=="Excellent"),sum(datamodif_non_assures$diagnostic=="Excellent"))
+
+Very_good<-c(sum(datamodif_assures$diagnostic=="Very good"), sum(datamodif_non_assures$diagnostic== "Very good"))
+
+Good<-c(sum(datamodif_assures$diagnostic=="Good"),sum(datamodif_non_assures$diagnostic=="Good"))
+
+Fair<-c(sum(datamodif_assures$diagnostic=="Fair"),sum(datamodif_non_assures$diagnostic=="Fair"))
+
+poor<-c(sum(datamodif_assures$diagnostic=="Autre"),sum(datamodif_non_assures$diagnostic=="Autre"))
+
+Situation<-c("Ayant une assurance complémentaire","Sans assurance complémentaire")
+
+table6<-cbind(Situation,Excellent, Very_good, Good, Fair, poor)
+
+kable(table6,align = "c",caption = "Statistiques concernant l'état de santé") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F)%>%
+  add_header_above(c(" ", "État de santé" = 5))
+
+
+```
+
+
+&nbsp;
+
+La plupart des individus se considèrent comme étant en bonne santé et n'ont pas de complémentaire santé
+
+Seul 9% des individus enquétés ne se considèrent pas comme étant en bonne santé.
+
+Il serait intéressant de comparer ces auto-évaluations au nombre de maladies chroniques ou simplement à l'évaluation faites par un médecin. Cette comparaison sera faite dans la suite de notre étude. 
+
+&nbsp; 
+
+&nbsp;
+
+$\bullet$ Intéressons nous maintenant aux \textbf{variables quantitatives et qualitatives ordinales} : 
+
+Ces variables sont : *age* (l'âge des individus), *educyear*( nombre d'années d'éducation), *hhincome*(le revenu des individus) et *chronic*(nombre de maladies chroniques).
+
+&nbsp; 
+
+```{r,fig.height=3,fig.width=9,fig.align="float_left"}
+attach(data)
+
+a<-ggplot(data, aes(age)) + geom_bar(fill="lightskyblue2")+theme_grey()+xlab("Age")+ylab("Nombre")
+
+```
+
+```{r,fig.height=3,fig.width=3,fig.align="center"}
+b<-ggplot(data, aes(educyear,fill=ins)) + geom_bar(fill="lightskyblue2")+theme_grey()+xlab("educyear")+ylab("Nombre")
+c<-ggplot(data, aes(chronic)) + geom_bar(fill="lightskyblue2")+theme_grey()+xlab("chronic")+ylab("Nombre")
+d<-ggplot(data) + geom_point(aes(x = X1, y = hhincome),col="lightskyblue2")+theme_grey()+xlab("Numéro individus")
+```
+
+```{r,fig.height=5,fig.width=8,message=F,warning=F}
+grid.arrange(a,b,c,d,ncol = 2)
+```
+
+
+```{r}
+t1<-c(3206,mean(datamodif$age),sd(datamodif$age),var(datamodif$age),min(datamodif$age),quantile(datamodif$age,.25),quantile(datamodif$age,.75),max(datamodif$age))
+
+t2<-c(3206,mean(datamodif$educyear),sd(datamodif$educyear),var(datamodif$educyear),min(datamodif$educyear),quantile(datamodif$educyear,.25),quantile(datamodif$educyear,.75),max(datamodif$educyear))
+
+t3<-c(3206,mean(datamodif$hhincome),sd(datamodif$hhincome),var(datamodif$hhincome),min(datamodif$hhincome),quantile(datamodif$hhincome,.25),quantile(datamodif$hhincome,.75),max(datamodif$hhincome))
+
+t4<-c(3206,mean(datamodif$chronic),sd(datamodif$chronic),var(datamodif$chronic),min(datamodif$chronic),quantile(datamodif$chronic,.25),quantile(datamodif$chronic,.75),max(datamodif$chronic))
+
+Table1<-data.frame(rbind(t1,t2,t3,t4))
+
+colnames(Table1)<-c("N","Mean","Sd.","Var.","Min","Q1","Q3","Max")
+rownames(Table1)<-c("Age","educyear","hhincome","chronic")
+
+kable(Table1, "latex", booktabs = T,align = "c") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F)
+```
+
+La moyenne d'âge est de 66 ans, la plupart des personnes enquétées ont un âge compris entre 65 et 69 ans. L'écart type est de 3,6, il est relativement faible. 
+
+Les personnes enquetées ont, pour la plupart, un niveau d'étude superieur à 10 ans, avec un pic significatif à 12 ans.
+
+Il est difficile d'appréhender la variable *hhincome*. En effet on ne sait pas si il s'agit d'un indice, d'un nombre de point ou même d'une valeur financière. On note cependant une très grande variabilité. La moyenne n'a de ce fait, aucun sens. 
+
+Enfin, en ce qui concerne le nombre de maladie chroniques, les personnes enquetées ont pour la plupart des maladies chroniques. La majeure partie d'entre eux en ont entre une et trois. La moyenne étant de 2 Seul un nombre très réduit de personnes ont plus de 6 maladies chroniques.
+
+
+
+#  Modèle général et maximum de vraissemblance
+
+## Généralités 
+
+Les modèles dichotomiques probit et logit admettent pour variable expliquée, non pas un codage quantitatif associé à la réalisation d'un évènement comme dans le cas de la spécification linéaire, mais la probabilité d'apparition de cet évènement, conditionnellement aux variables exogènes. notre variable à expliquer étant *ins* on à: 
+
+
+\[ins=\left\{
+  \begin{array}{rcr}
+    1 & \mbox{avec la probabilité P$i$}  \\
+        0 & \mbox{avec la probabilité 1-P$i$}\\
+  \end{array}
+\right.\]
+
+Ainsi, on considère le modèle suivant : 
+
+\begin{large}
+\[p_i= Prob(y_i=1|x_i) = F(x_i\beta)\] 
+\end{large}
+
+dont la fonction de densité est :
+
+\begin{large}
+\[f(Y_i|X_i)= P^{Y_i} (1-P)^{1-Y_i} \] 
+\end{large}
+
+Avec : $Y_i=0,1$ et $P_i= F(x_i\beta)$
+
+&nbsp;
+
+\textbf{Maximum de vraissemblance:} 
+
+
+\begin{center}
+Pour un individu i sachant ses caractéristiques, la vraissemblance associée est : 
+
+\[ln L(Y_i,\beta)= Y_i ln [F(X\beta)] + (1-Y_i) ln [1-F(X\beta)]\] 
+\end{center}
+
+Pour tout N : 
+
+\begin{center}
+\[lnL(Y_i,\beta)= \sum\limits_{\substack{i=1}}^{N} \{Y_i ln [F(X\beta)] + (1-Y_i) ln [1-F(X\beta)]\}\] 
+
+\end{center}
+
+La maximisation de la quantité $lnL(Y_i,\beta)$ par le biais de Newton-Raphson nous permet de converger vers es solutions plausibles à notre problème.
+
+&nbsp; 
+
+
+\textbf{Estimations:} 
+
+
+
+Le modèle logit général s'écrit : 
+
+\begin{center}
+\begin{large}
+\[Y= \textbf{P}(Y=\frac{1}{\{X_j\}})+\epsilon=\pi(\{X_i\})+\epsilon = \frac{e^{\beta_0 + \sum_{j=1}^{p} \beta_jX_j}}{1+e^{\beta_0 + \sum_{j=1}^{p} \beta_jX_j}}+\epsilon\] 
+\end{large}
+\end{center}
+
+
+Le modèle probit général s'écrit : 
+
+\begin{center}
+\begin{large}
+\[F(X_i \theta) =\Phi(X_i \theta)= \int_{-\infty}^{X_i \theta} \frac{e^{-t^2/2}}{\sqrt{2\pi}}\, \mathrm{d}x \] 
+\end{large}
+\end{center}
+où F est la fonction de répartition d'un gaussienne centrée réduite, usuellement notée $\Phi$.
+
+\begin{center}
+avec 
+\begin{eqnarray}
+\epsilon = 1-\pi(X) &si& Y=1\\
+\epsilon = -\pi(X) &si& Y=0
+\end{eqnarray}
+
+
+\end{center}
+
+
+&nbsp;
+
+
+```{r}
+data$hisp<-as.factor(data$hisp)
+data$female<-as.factor(data$female)
+data$married<-as.factor(data$married)
+data$excel<-as.factor(data$excel)
+data$vegood<-as.factor(data$vegood)
+data$good<-as.factor(data$good)
+data$fair<-as.factor(data$fair)
+data$poor<-as.factor(data$poor)
+data$retire<-as.factor(data$retire)
+data$sretire<-as.factor(data$sretire)
+data$hstatusg<-as.factor(data$hstatusg)
+data$ins<-as.factor(data$ins)
+
+data$white<-as.factor(data$white)
+```
+
+&nbsp; 
+
+
+
+```{r}
+data2<-data
+
+data2$adl<-as.factor(data2$adl)
+data2$chronic<-as.factor(data2$chronic)
+
+data2$hhincome<-log(hhincome+1)
+```
+
+\newpage
+## Echantillonnage : Apprentissage vs test
+
+Dans le but d'évaluer les differents modèles que nous allons estimer, nous allons séparer la base de données de deux. 
+
+On effectue un tirage aléatoire sans remise et on décide que 90% des données, soit 2885 individus, seront affectées à l'échantillon d'apprentissage, à partir duquel seront construit les modèles.
+
+Les 10% restant, soit 321 individus, seront affectés à l'échantillon test. Ce dernier sera utilisé pour tester les modèles.
+
+```{r}
+set.seed(23)
+d = sort(sample(nrow(data), nrow(data) * 0.90))
+appren <- data[d, ]
+test <- data[-d, ]
+
+appren1 <- data2[d, ]
+test1 <- data2[-d, ]
+```
+
+&nbsp; 
+
+## Modèle général
+
+Le modèle général est estimé sur toutes les variables explicatives de notre base de données sans aucune transformation préalable.
+Il s'ecrtit :
+
+\begin{center}
+$Ln(\frac{P_i}{1-P_i})$ = $\beta_1$ $private_i$ + $\beta_2$ $age_i$ + $\beta_3$ $hisp_i$ + $\beta_4$ $white_i$ + $\beta_5$ $educyear_i$ + $\beta_6$ $married_i$  + $\beta_7$ $excel_i$ + $\beta_8$ $vegood_i$ + $\beta_9$ $good_i$ + $\beta_{10}$ $fair_i$ + $\beta_{11}$ $poor_i$ + $\beta_{12}$ $chronic_i$ + $\beta_{13}$ $adl_i$ + $\beta_{14}$ $retire_i$ + $\beta_{15}$ $sretire_i$ + $\beta_{16}$ $hhincome_i$ + $\beta_{17}$ $hstatusg_i$
+\end{center}
+
+&nbsp;
+
+&nbsp;
+
+**\textbf{Remarque}:**  Une première régréssion nous a permise d'observer que : parmi les variables présentent dans la base de données certaines sont colinéaires et renseignent sur les mêmes informations. C'est le cas notamment de la variable *private* (assurance complémentaire privé) qui renseigne sur les mêmes informations que la variable à expliquée *ins*. Les variables renseignant sur l'état de santé : *excel, good, vegood, fair et poor* sont résumé dans la variable *hstatug* et sont donc colinéaires avec cette dernière. Elles ne seront donc pas incluses, elles non plus, dans la régression du modèle général. 
+
+&nbsp;
+
+&nbsp;
+
+L'équation du modèle général qui sera estimée est donc : 
+
+&nbsp;
+
+\begin{center}
+$Ln(\frac{P_i}{1-P_i})$ = $\beta_1$ $age_i$ + $\beta_2$ $hisp_i$ + $\beta_3$ $white_i$ + $\beta_4$ $educyear_i$ + $\beta_5$ $married_i$  + $\beta_6$ $chronic_i$ + $\beta_{7}$ $adl_i$ + $\beta_{8}$ $retire_i$ + $\beta_{9}$ $sretire_i$ + $\beta_{10}$ $hhincome_i$ + $\beta_{11}$ $hstatusg_i$
+\end{center}
+
+&nbsp;
+
+# Estimation 
+
+Les résultats de ces régressions sont renseignés dans le tableau suivant : 
+
+```{r}
+lm<-glm(ins~age+ hisp+white+ female+ educyear+married+chronic+adl+retire+sretire+ hhincome+ hstatusg, data=appren1, family=binomial(link=logit))
+lmm<-glm(ins~age+ hisp+white+ female+ educyear+married+chronic+adl+retire+sretire+ hhincome+ hstatusg, data=appren1, family=binomial(link=probit))
+```
+
+
+```{r,warning=F,message=F,results='asis',header=F}
+library(stargazer)
+stargazer(lm,lmm,type="latex",header=F,font.size = "tiny",title="Résultats modèles générale")
+```
+
+\newpage 
+
+# Autres modèles
+
+Nous allons maintenant estimer différents modèles et réaliser diverses régréssions. Pour chacun d'eux, les résultats des régréssions probit et logit seront présentées. 
+
+La comparaion des modèles logit et probit, ainsi que les interprétations des differents coefficients ne seront faites que sur le modèle final retenu. 
+
+&nbsp;
+
+## Second modèle 
+
+Nous allons, en nous basant sur le modèle général, effectuer une sélection des variables et ce pour plusieurs raisons, la principale étant que : un modèle avec peu de variables sera plus facilement généralisable en termes de robustesse, c'est le *Principe du rasoir d'Occam*.
+
+Pour ce faire nous allons faire une sélection automatique des variables du modèle général, sur le critère d'Akaïke (AIC). Ce dernier s'écrit comme suit: $AIC= 2k-2\ln(L)$ ; où k est le nombre de paramètres à estimer du modèle et L est le maximum de la fonction de vraisemblance du modèle.
+
+Si l'on considère un ensemble de modèles candidats, le modèle choisi est celui qui aura la plus faible valeur d'AIC. On à :
+
+
+```{r,include=F}
+step0<-step(lm,method="both")
+summary(step0)
+```
+
+```{r}
+m.logit<-glm(formula = ins ~ hisp + educyear + married + retire + hhincome, 
+    family = binomial(link = logit), data = appren1)
+
+lmm2<-glm(formula = ins ~ hisp + educyear + married + retire + hhincome, 
+    family = binomial(link = probit), data = appren1)
+
+```
+
+```{r,warning=F,message=F,results='asis',header=F}
+library(stargazer)
+stargazer(m.logit,lmm2,type="latex",header=F,font.size = "footnotesize",title="Résultats modèle AIC sur modèle général")
+```
+
+
+Les régression obtenu après l'AIC sont donc : 
+
+\begin{center}
+$Logit(ins)$ = -0.74891 $hisp_1$ +  0.07706  $educyear$ + 0.16105 $married_1$ + 0.22802 $retire_1$ + 0.64627 $hhincome$ + $\varepsilon$
+\end{center}
+
+\begin{center}
+$Probit(ins)$ = -0.442 $hisp_1$ +  0.04842  $educyear$ + 0.10284 $married_1$ +  0.13612 $retire_1$ +0.38863 $hhincome$  + $\varepsilon$
+\end{center}
+
+&nbsp; 
+A l'exception du coefficient de la variable *married* tous les coefficients sont significatifs au seuil de 0.01.
+
+## Le troisième modèle : modèle général transformé
+
+Pour construire ce modèle nous allons revenir au modèle général et transformer diverses variables pour tenter de les rendre plus pertinentes. Nous nous baserons essentiellement sur notre intuiton et sur les différentes informations que nous avons pu receuillir sur la base de données et le systême américain en général.
+
+Commençons par rappeler les effectifs des modalités de la variable à expliquer : 
+
+
+```{r}
+i1<-1965
+i2<-1241
+ii<-rbind(i1,i2)
+rownames(ii)<-c(0,1)
+colnames(ii)<-"Effectif"
+
+kable(ii,"latex",align = "c",caption = "Variable à expliquer : ins") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F) 
+```
+
+**Remarque :** Toutes les valeurs des effectifs ainsi que les autres résultats qui suivront seront ceux correspondant à notre échantillon d'apprentissage, sur lequel nos modèles sont construits. 
+
+&nbsp;
+
+### Transformation des variables 
+
+Passons à la transformation des variables.  
+
+&nbsp;
+
+\begin{center}
+\large{\textbf{chronic}}
+\end{center}
+
+Les effectifs des différentes modalités de la variable *chronic* en fonction de la variable à expliquer *ins* sont renseignés dans le tableau suivant : 
+```{r}
+c1<- xtabs(~ins + chronic, data = appren1)
+
+kable(c1,"latex",align = "c",caption = "Tableau croisé des effectifs : ins et chronic") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("", "chronic" = 9))
+
+
+appren$chronic[appren$chronic==1]<-"1-2"
+appren$chronic[appren$chronic==2]<-"1-2"
+appren$chronic[appren$chronic==3]<-"3-8"
+appren$chronic[appren$chronic==4]<-"3-8"
+appren$chronic[appren$chronic==5]<-"3-8"
+appren$chronic[appren$chronic==6]<-"3-8"
+appren$chronic[appren$chronic==7]<-"3-8"
+appren$chronic[appren$chronic==8]<-"3-8"
+
+test$chronic[test$chronic==1]<-"1-2"
+test$chronic[test$chronic==2]<-"1-2"
+test$chronic[test$chronic==3]<-"3-8"
+test$chronic[test$chronic==4]<-"3-8"
+test$chronic[test$chronic==5]<-"3-8"
+test$chronic[test$chronic==6]<-"3-8"
+test$chronic[test$chronic==7]<-"3-8"
+test$chronic[test$chronic==8]<-"3-8"
+
+```
+
+Les catégories d'individus ayant plus de 3 maladies chroniques ne sont pas du tout représentatives de l'échantillon. On aurait pu supposer que les individus ayant plus de 3 maladies chroniques seraient plus susceptible d'avoir une assurance complémentaire par rapport à ceux qui ont moins de trois maladies chroniques étant donné que **Médicare** ne couvre pas tous les frais liés à leur santé . Ce n'est pas le cas.
+
+L'immense majorité des individus ayant plus de 3 maladies chroniques n'ont pas de complémentaire santé.
+
+On va donc simplement séparer l'échantillon en trois catégories : la première catégorie sera constituée des individus n'ayant aucunes maladies chroniques, la seconde sera constituée des individus ayant une à deux maladies chroniques et enfin la dernière sera constituée des individus ayant plus de deux maladies chroniques, et ce afin de tenter de palier à ces incohérences observées. 
+
+On aura donc :
+```{r}
+c2x<- xtabs(~ins + chronic, data = appren)
+
+insc2<-c(0,1)
+c20<-c(191,104)
+c21<-c(760,525)
+c23<-c(527,297)
+
+c2<-cbind(insc2,c20,c21,c23)
+colnames(c2)<-c("ins","0","[1:2]","[3:8]")
+
+kable(c2,"latex",align = "c",caption = "Tableau croisé après tranformation") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("", "chronic" = 3))
+```
+
+
+\begin{center}
+\large{\textbf{adl}}
+\end{center}
+
+Concernant la variable *adl*, les effectifs des modalités de cette variable par rapport à la variable à expliquer sont renseignées dans le tableau suivant : 
+
+```{r}
+adl1<-xtabs(~ins + adl, data = appren)
+
+
+kable(adl1,"latex",align = "c",caption = "Répartition adl :: ins ") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("ins ", "adl" = 6))
+
+```
+
+Comme le montre la **Table 10** :  la répartition des effectifs des différentes modalités par rapport à la variable à expliquer est très inégalement répartit.
+
+La variable *adl* renseigne sur le nombre de limitations de la vie quotidienne. Nous allons transformer cette variable et la séparer en deux modalités. Ceux qui ont des contraintes et ceux qui n'en ont pas.
+
+On aura donc :
+
+```{r}
+
+appren$adl[appren$adl==1]<-"1-5"
+appren$adl[appren$adl==2]<-"1-5"
+appren$adl[appren$adl==3]<-"1-5"
+appren$adl[appren$adl==4]<-"1-5"
+appren$adl[appren$adl==5]<-"1-5"
+
+test$adl[test$adl==1]<-"1-5"
+test$adl[test$adl==2]<-"1-5"
+test$adl[test$adl==3]<-"1-5"
+test$adl[test$adl==4]<-"1-5"
+test$adl[test$adl==5]<-"1-5"
+
+
+adl2x<- xtabs(~ins + adl, data = appren)
+
+adl2i<-c(0,1)
+adl2ii<-c(1182,826)
+adl2iii<-c(296,100)
+adl2<-cbind(adl2i,adl2ii,adl2iii)
+colnames(adl2)<-c("ins","0","[1:5]")
+
+kable(adl2,"latex",align = "c",caption = "Table modifié adl :: ins ") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("", "adl" = 2))
+
+```
+
+&nbsp; 
+
+\begin{center}
+\large{\textbf{hhincome}}
+\end{center}
+
+
+La **Figure 1** montre la distribution initiale de la variable *hhincome*. Cette dernière est très mal distribuée sur l'ensemble de l'échantillon. On décide donc de la transformer en logarithme.
+
+Après cette transformation, on constate que la variable suit une distribution normale, comme le montre la **Figure 2**.
+
+```{r,fig.height=3}
+
+hh1<-ggplot(appren,aes(x=hhincome,fill=ins))+geom_histogram(fill="lightskyblue2")+theme_gray()+ggtitle("Figure 1")
+
+data$hhincome<-log(data$hhincome+1)
+
+hh2<-ggplot(appren1,aes(x=hhincome,fill=ins))+geom_histogram(fill="lightskyblue2")+theme_gray()+xlab("log(hhincome)")+ggtitle("Figure 2")
+
+grid.arrange(hh1,hh2,ncol=2)
+```
+
+En plus de cette transformation en logarithme, nous allons transformer la variable *hhincome* et la subdiviser en deux classes séparées par la moyenne, tel que : 
+
+```{r}
+appren$hhincome<-log(appren$hhincome+1)
+test$hhincome<-log(test$hhincome+1)
+```
+
+
+```{r}
+
+
+Breakshh = c(min(appren$hhincome),3.590082, max(appren$hhincome))
+
+hhincome.d = cut(appren$hhincome, breaks = Breakshh, include.lowest = TRUE)
+
+appren<-cbind(appren,hhincome.d)
+
+hhincome.d = cut(test$hhincome, breaks = Breakshh, include.lowest = TRUE)
+
+test<-cbind(test,hhincome.d)
+
+hh1<-xtabs(~ins + hhincome.d, data = appren)
+
+kable(hh1,align = "c",caption = "Répartition hhincome ") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("ins", "hhincome" = 2))
+```
+
+&nbsp;
+
+\begin{center}
+\large{\textbf{age}}
+\end{center}
+
+Des recherche sur le **Medicare** nous ont permis d'apprendre qu'a partir de 65 ans, ils n'y avait plus de condition pour bénéficier de l'assurance santé, d'ou le pic des effectifs.
+
+On va donc séparé la variable *age* en deux modalités : avant et après 65 ans.
+
+Les effectifs des nouvelles modalités de la variable ainsi transformée par rapport à la variable à expliquer sont: 
+
+```{r}
+Breaksage = c(min(appren$age),64, max(appren$age))
+
+age.d = cut(appren$age, breaks = Breaksage, include.lowest = TRUE)
+
+appren<-cbind(appren,age.d)
+
+a2<-xtabs(~ins + age.d, data = appren)
+
+kable(a2,"latex",align = "c",caption = "Table modifié ins - age") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("ins", "age" = 2))
+
+age.d = cut(test$age, breaks = Breaksage, include.lowest = TRUE)
+
+test<-cbind(test,age.d)
+
+
+```
+
+
+\begin{center}
+\large{\textbf{educyear}}
+\end{center}
+
+Le parcours classique dans le systême américain s'éffectue en 12 ans. 
+
+On decide donc de séparer la variable *educyear* en trois modalités, la première : constituée des individus ayant fait moins de 12 ans d'études, la seconde : constituée des individus ayant fait 12 ans d'études et la dernière : de ceux ayant fait plus de 12 ans d'études. 
+
+Les effectifs des modalités de la variable *educyear* ainsi transformée par rapport à la variable à expliquer sont donc : 
+
+```{r}
+
+appren$educyear[appren$educyear==0]<-"0-11"
+appren$educyear[appren$educyear==1]<-"0-11"
+appren$educyear[appren$educyear==2]<-"0-11"
+appren$educyear[appren$educyear==3]<-"0-11"
+appren$educyear[appren$educyear==4]<-"0-11"
+appren$educyear[appren$educyear==5]<-"0-11"
+appren$educyear[appren$educyear==6]<-"0-11"
+appren$educyear[appren$educyear==7]<-"0-11"
+appren$educyear[appren$educyear==8]<-"0-11"
+appren$educyear[appren$educyear==9]<-"0-11"
+appren$educyear[appren$educyear==10]<-"0-11"
+appren$educyear[appren$educyear==11]<-"0-11"
+appren$educyear[appren$educyear==12]<-"12"
+appren$educyear[appren$educyear==13]<-"13-17"
+appren$educyear[appren$educyear==14]<-"13-17"
+appren$educyear[appren$educyear==15]<-"13-17"
+appren$educyear[appren$educyear==16]<-"13-17"
+appren$educyear[appren$educyear==17]<-"13-17"
+
+test$educyear[test$educyear==0]<-"0-11"
+test$educyear[test$educyear==1]<-"0-11"
+test$educyear[test$educyear==2]<-"0-11"
+test$educyear[test$educyear==3]<-"0-11"
+test$educyear[test$educyear==4]<-"0-11"
+test$educyear[test$educyear==5]<-"0-11"
+test$educyear[test$educyear==6]<-"0-11"
+test$educyear[test$educyear==7]<-"0-11"
+test$educyear[test$educyear==8]<-"0-11"
+test$educyear[test$educyear==9]<-"0-11"
+test$educyear[test$educyear==10]<-"0-11"
+test$educyear[test$educyear==11]<-"0-11"
+test$educyear[test$educyear==12]<-"12"
+test$educyear[test$educyear==13]<-"13-17"
+test$educyear[test$educyear==14]<-"13-17"
+test$educyear[test$educyear==15]<-"13-17"
+test$educyear[test$educyear==16]<-"13-17"
+test$educyear[test$educyear==17]<-"13-17"
+
+
+
+
+ed1<-xtabs(~ins + educyear, data = appren)
+
+kable(ed1,align = "c",caption = "Table modifié ins - age") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("ins", "educyear" = 3))
+```
+
+&nbsp; 
+
+
+**Remarque : ** Diverses transformations plus ou moins pertinentes ont été effectués sur les divers variables. Seules les transformations les plus pertinentes et permettant d'obtenir le meilleur des modèles ont été  susmentionnées et seront utilisées dans la suite de notre étude. Les autres transformations et résultats seront présentés en **Annexe**. 
+
+&nbsp;
+
+### Régressions
+
+Les résultats des régressions du modèle général transformé sont renseignés dans le tableau suivant :
+
+```{r}
+lm3<-glm(ins~age.d+ hisp+white+ female + educyear+married+chronic+adl+retire+sretire+ hhincome.d+ hstatusg, data=appren, family=binomial(link=logit))
+lmm3<-glm(ins~age.d+ hisp+white+ female+ educyear+married+chronic+adl+retire+sretire+ hhincome.d+ hstatusg, data=appren, family=binomial(link=probit))
+
+```
+\newpage
+
+```{r,warning=F,message=F,results='asis',header=F}
+stargazer(lm3,lmm3,type="latex",header=F,font.size ="footnotesize",title="Résultats modèles générale")
+```
+
+Ce modèle transformé semble beaucoup plus pertinent que le modèle initial.
+
+
+
+## Quatrième modèle
+
+
+Le **quatrième modèle** à été obtenu, comme le second, en faisant une sélection automatique des variables du modèle 3, sur le critère d'Akaïke (AIC).
+
+
+Les résultats des régressions du modèle retenu sont renseignés dans le tableau suivant : 
+
+```{r,include=F}
+re<-step(lm3,method="both")
+
+```
+
+```{r, include=F}
+summary(re)
+```
+
+
+```{r}
+m.logit2<-glm(formula = ins ~ hisp + educyear + married + chronic + adl + 
+    retire + hhincome.d + hstatusg, family = binomial(link = logit), 
+    data = appren)
+laicprob<-glm(formula = ins ~ hisp + educyear + married + chronic + adl + 
+    retire + hhincome.d + hstatusg, family = binomial(link = probit), 
+    data = appren)
+
+```
+
+```{r,warning=F,message=F,results='asis',header=F}
+library(stargazer)
+stargazer(m.logit2,laicprob,type="latex",header=F,font.size = "footnotesize",title="Résultats régréssion AIC")
+```
+
+
+
+Les modèles obtenu après l'AIC sont donc : 
+
+\begin{center}
+$Logit(ins)$ = - 0.9078 1 $hisp_1$ +  0.5036 $educyear_{12}$ +  0.5732 $educyear_{13-17}$ +  0.3460 $married_1$ +    0.2971 $chronic_{1-2} $ +  0.4507 $chronic_{3-8} $ - 0.4059 $adl_{1-5}$ + 0.1885  $retire_1$ + 0.7893 $hhincome_{(3.59,7.18]}$ +  0.2141 $hstatusg1$ + $\varepsilon$
+\end{center}
+
+\begin{center}
+$Probit(ins)$ = -0.5373 1 $hisp_1$ +   0.3065 $educyear_{12}$ +  0.3528 $educyear_{13-17}$ +  0.2102 $married_1$ +    0.1792 $chronic_{1-2} $ +  0.2731 $chronic_{3-8} $ - 0.2478 $adl_{1-5}$ + 0.1153  $retire_1$ + 0.4875 $hhincome_{(3.59,7.18]}$ +  0.1343 $hstatusg1$ + $\varepsilon$
+\end{center}
+
+&nbsp; 
+
+# Comparaison des modèles 
+
+Dans cette partie nous allons comparer les résultats des modèles 2 et 4, qui sont respectivement les modèles obtenus apres l'AIC effectué sur le modèle général et le modèle général transformé. 
+
+Notons que nous allons içi comparer les modèles Logit. Nous allons d'abord effectuer des tests afin de déterminer si les modèles sont pertinents. Nous allons ensuite appliquer ces modèles à l'échantillon test afin de déterminer lequel est le meilleur.
+
+&nbsp;
+
+
+\begin{center}
+\textbf{Modèle 2} 
+
+$Logit(ins)$ = -0.74891 $hisp_1$ +  0.07706  $educyear$ + 0.16105 $married_1$ + 0.22802 $retire_1$ + 0.64627 $hhincome$ + $\varepsilon$
+
+
+
+\textbf{Modèle 4}
+
+$Logit(ins)$ = -0.9078 1 $hisp_1$ +  0.5036 $educyear_{12}$ +  0.5732 $educyear_{13-17}$ +  0.3460 $married_1$ +    0.2971 $chronic_{1-2} $ +  0.4507 $chronic_{3-8} $ - 0.4059 $adl_{1-5}$ + 0.1885  $retire_1$ + 0.7893 $hhincome_{(3.59,7.18]}$ +  0.2141 $hstatusg1$ + $\varepsilon$
+\end{center}
+
+
+&nbsp; 
+
+
+
+### Test du rapport de vraisemblance 
+
+
+
+La statistique de test est basée sur la différence des rapports de vraisemblance entre le modèle complet et le modèle sous $H_0$. La statistique de test est :
+
+\[2[\zeta_n(\widehat{\beta})-\zeta_n(\widehat{\beta_{H_0}})]\xrightarrow[]{\zeta} {\chi^2}_q\]    
+
+On à : 
+
+\begin{center}
+$H_0 : \beta_0 = \beta_1 =. . .  =\beta_{q-1}=0$  \\
+contre \\
+$H_1 : {\exists}k\in \{0,...,q-1 \} : \beta_k \neq 0$
+\end{center}
+
+```{r}
+chi2 <- c(with(m.logit, null.deviance - deviance),with(m.logit2, null.deviance - deviance))
+ddl <- c(with(m.logit, df.null - df.residual),with(m.logit2, df.null - df.residual))
+pvalue <- pchisq(chi2, ddl, lower.tail = F)
+
+testmax<-rbind(chi2,ddl,pvalue)
+colnames(testmax)<-c("Modèle 2","Modèle 4")
+
+kable(testmax,"latex",align = "c",caption = "Résultats des tests") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+
+```
+
+La *p-value* associée à ces statistiques de test sont inferieur au seuil de 5% et ce pour les deux modèles. Par conséquent nous pouvons donc conclure que les deux modèles sont globalement significatifs.
+
+&nbsp;
+
+### Résidus de déviances
+
+Pour les régressions logistiques, on s'intéresse la plupart du temps aux résidus de déviance. Ils prennent généralement les valeurs qui oscillent entre -2 et 2. Construisons un index plot pour détecter les valeurs aberrantes.
+
+```{r,fig.height=9}
+par(mfrow = c(2, 1))
+plot(rstudent(m.logit),main="Modèle 2", type = "p", cex = 0.5, ylab = "Résidus studentisés ", col = "black", ylim = c(-3, 3),xlab="")
+abline(h = c(-2, 2), col = "red")
+
+plot(rstudent(m.logit2),main="Modèle 4", type = "p", cex = 0.5, ylab = "Résidus studentisés ", col = "black", ylim = c(-3, 3),xlab="")
+abline(h = c(-2, 2), col = "red")
+```
+Il semblerait que le nombre de valeurs pouvant être considérées comme aberrantes soit très minime.
+
+
+
+## Application 
+
+### Application à l'échantillon apprentissage 
+
+```{r}
+appren.p <- cbind(appren1, predict(m.logit, newdata = appren1, type = "link", 
+    se = TRUE))
+
+appren.p <- within(appren.p, {
+    PredictedProb <- plogis(fit, lower.tail = TRUE)
+    LL <- plogis(fit - (1.96 * se.fit))
+    UL <- plogis(fit + (1.96 * se.fit))
+})
+
+appren.p <- cbind(appren.p, pred.ins = factor(ifelse(appren.p$PredictedProb > 
+    0.5, 1, 0)))
+```
+
+
+```{r}
+appren.p1 <- cbind(appren, predict(m.logit2, newdata = appren, type = "link", 
+    se = TRUE))
+
+
+appren.p1 <- within(appren.p1, {
+    PredictedProb <- plogis(fit, lower.tail = TRUE)
+    LL <- plogis(fit - (1.96 * se.fit))
+    UL <- plogis(fit + (1.96 * se.fit))
+})
+
+
+appren.p1 <- cbind(appren.p1, pred.ins = factor(ifelse(appren.p1$PredictedProb > 
+    0.5, 1, 0)))
+```
+
+```{r}
+# Matrices de confusion
+m.confusion1 <- as.matrix(table(appren.p$pred.ins, appren.p$ins))
+
+m.confusion <- as.matrix(table(appren.p1$pred.ins, appren.p1$ins))
+vide<-c("","")
+
+conf<-cbind(m.confusion ,vide,m.confusion1)
+colnames(conf)<-c("0","1","","0","1")
+
+kable(conf,"latex",align = "c",caption = "Matrice de confusion apprentissage") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F) %>%
+add_header_above(c(" ", "Modèle 2" = 2," ","Modèle 4" = 2))
+```
+&nbsp;
+
+
+```{r}
+m.confusion <- unclass(m.confusion)
+# Taux d'erreur
+Tx_err <- function(y, ypred) {
+    mc <- table(y, ypred)
+    error <- (mc[1, 2] + mc[2, 1])/sum(mc)
+    
+}
+
+m.confusion1 <- unclass(m.confusion1)
+# Taux d'erreur
+Tx_err1 <- function(y, ypred) {
+    mc <- table(y, ypred)
+    error <- (mc[1, 2] + mc[2, 1])/sum(mc)
+    
+}
+
+```
+
+```{r}
+tx_a1<-Tx_err(appren.p$pred.ins, appren.p$ins)
+
+tx_a2<-Tx_err1(appren.p1$pred.ins, appren.p1$ins)
+
+```
+
+```{r}
+tx_a3<-cbind(tx_a1,tx_a2)
+
+colnames(tx_a3)<-c("Modèle 2","Modèle 4")
+
+kable(tx_a3,"latex",align = "c",caption = "Taux d'erreur") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+```
+
+\begin{center}
+\textbf{Comparons les courbes ROC obtenues sur l'échantillon d'apprentissage}
+\end{center}
+
+```{r}
+Pred = prediction(appren.p$PredictedProb, appren.p$ins)
+Perf = performance(Pred, "tpr", "fpr")
+perf <- performance(Pred, "auc")
+
+Pred1 = prediction(appren.p1$PredictedProb, appren.p1$ins)
+Perf1 = performance(Pred1, "tpr", "fpr")
+perf1 <- performance(Pred1, "auc")
+
+
+par(mfrow = c(1, 2))
+plot(Perf, colorize = TRUE, main = "Modèle 2")
+plot(Perf1, colorize = TRUE, main = "Modèle 4")
+
+
+```
+
+&nbsp;
+
+
+```{r}
+airr<-data.frame(cbind(perf@y.values[[1]],perf1@y.values[[1]]))
+
+colnames(airr)<-c("Modèle 2","Modèle 4")
+
+kable(airr,"latex",align = "c",caption = "Aire sous les courbes", escape = TRUE) %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+
+```
+
+Dans la théorie de la détection du signal, l'AUC ou "aire sous la coube" fournit une mesure agrégée des performances pour tous les seuils de classification possibles. On peut interpréter l'AUC comme une mesure de la probabilité pour que le modèle classe un exemple positif aléatoire au-dessus d'un exemple négatif aléatoire. Nos courbes s’écartent de la ligne du classificateur aléatoire (modèle dans lequel l'esperance est égale à 0.5) et se rapproche du coude du classificateur idéal (qui passe de (0, 0) à (0, 1) à (1, 1)). 
+
+Ce qui signifie simplement qu'utiliser nos modèles afin de déterminer si une personne est assurée ou non est bien plus pertinent que de faire un simple pile ou face.
+
+### Application à l'échantillon test
+
+```{r}
+
+test.p <- cbind(test1, predict(m.logit, newdata = test1, type = "response", se = TRUE))
+
+test.p <- cbind(test.p, pred.ins = factor(ifelse(test.p$fit > 0.5, 1, 0)))
+
+
+m.confusiontest <- as.matrix(table(test.p$pred.ins, test.p$ins))
+
+
+test.p1 <- cbind(test, predict(m.logit2, newdata = test, type = "response", se = TRUE))
+test.p1 <- cbind(test.p1, pred.ins = factor(ifelse(test.p1$fit > 0.5, 1, 0)))
+
+
+m.confusiontest1 <- as.matrix(table(test.p1$pred.ins, test.p1$ins))
+
+
+
+conf1<-cbind(m.confusiontest ,vide,m.confusiontest1)
+colnames(conf1)<-c("0","1","","0","1")
+
+kable(conf1,"latex",align = "c",caption = "Matrice de confusion test") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F,font_size = 16) %>%
+add_header_above(c(" ", "Modèle 2" = 2," ","Modèle 4" = 2))
+
+```
+
+
+
+```{r}
+
+Tx_err <- function(y, ypred) {
+    mc <- table(y, ypred)
+    error <- (mc[1, 2] + mc[2, 1])/sum(mc)
+    
+}
+
+tx3t<-Tx_err(test.p$pred.ins, test.p$ins)
+
+tx3t2<-Tx_err(test.p1$pred.ins, test.p1$ins)
+
+ttx3<-cbind(tx3t,tx3t2)
+
+colnames(ttx3)<-c("Modèle 2","Modèle 4")
+
+
+kable(ttx3,"latex",align = "c",caption = "Taux d'erreur test", escape = TRUE) %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+```
+
+Le taux d'erreur de prédiction du modèle 4 est plus faible que celui du modèle 2. Il sera donc plus fiable que ce dernier. Les transformations apportées afin de construire le modèle 4 ont donc été utiles.
+
+\begin{center}
+\textbf{Comparons les courbes ROC obtenues sur l'échantillon test}
+\end{center}
+```{r}
+library(ROCR)
+```
+
+```{r}
+library(gridExtra)
+```
+
+```{r}
+library(ROCR)
+test.p1$fit<-as.numeric(test.p1$fit)
+
+
+Predtest1 = prediction(test.p1$fit, test.p1$ins)
+Perftest1 = performance(Predtest1, "tpr", "fpr")
+perftest1 <- performance(Predtest1, "auc")
+
+Predtest = prediction(test.p$fit, test.p$ins)
+Perftest = performance(Predtest, "tpr", "fpr")
+perftest <- performance(Predtest, "auc")
+
+par(mfrow = c(1, 2))
+plot(Perftest, colorize = TRUE, main = "Modèle 2")
+plot(Perftest1, colorize = TRUE, main = "Modèle 4")
+
+
+```
+
+
+```{r}
+airr<-data.frame(cbind(perftest@y.values[[1]],perftest1@y.values[[1]]))
+
+colnames(airr)<-c("Modèle 2","Modèle 4")
+
+kable(airr,"latex",align = "c",caption = "Aire sous les courbes", escape = TRUE) %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+
+```
+
+&nbsp;
+
+### Modèle à choisir : 
+
+&nbsp;
+
+```{r}
+
+Mod1<-c(tx3t2,sensitivity(m.confusiontest1),specificity(m.confusiontest1),precision(m.confusiontest1),perftest1@y.values[[1]])
+Mod2<-c(tx3t,sensitivity(m.confusiontest),specificity(m.confusiontest),precision(m.confusiontest),perftest@y.values[[1]])
+
+
+TABB<-rbind(Mod2,Mod1)
+
+rownames(TABB)<-c("Modèle 2","Modèle 4")
+
+colnames(TABB)<-c("Taux d'erreur test","sensibilité","spécificité","précision","AUC test")
+
+
+kable(TABB,"latex",align = "c",caption = "Comparaison des modèles 2 et 4") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+```
+
+&nbsp; 
+
+La **Table 24** résume les probabilités innhérantes aux deux modèles. 
+
+Nous savons que : la sensibilité indique la probabilité qu'un individu appartienne à la bonne catégorie sachant qu'il doit y appartenir et qu'à l'inverse la spécificité indique la probabilité qu'un individu n'appartienne pas à une catégorie sachant qu'il ne doit pas y appartenir. 
+
+Notre objectif étant de déterminer si un individu et assuré ou non, nous allons donc sélectionner le modèle ayant à la fois la sensibilité et la spécificité la plus élevée. Aussi, nous voulons que notre modèle soit le plus précis possible, nous allons donc tenir compte de la précision. 
+
+Considérant les faits susmentionnés, le modèle 4 est à tout point de vu meilleur que le modèle 2. C'est donc bien le modèle 4 qui sera retenu et étudié dans la suite de notre étude.
+
+
+&nbsp; 
+
+&nbsp; 
+
+# Comparaison modèles logit et probit 
+
+Nous allons içi comparer les modèles logit et probit de notre régression finale : le modèle 4. 
+
+Rappellons que :
+
+\begin{center}
+$Logit(ins)$ = -0.9078 1 $hisp_1$ +  0.5036 $educyear_{12}$ +  0.5732 $educyear_{13-17}$ +  0.3460 $married_1$ +    0.2971 $chronic_{1-2} $ +  0.4507 $chronic_{3-8} $ - 0.4059 $adl_{1-5}$ + 0.1885  $retire_1$ + 0.7893 $hhincome_{(3.59,7.18]}$ +  0.2141 $hstatusg1$ + $\varepsilon$
+\end{center}
+
+\begin{center}
+$Probit(ins)$ = -0.5373 1 $hisp_1$ +   0.3065 $educyear_{12}$ +  0.3528 $educyear_{13-17}$ +  0.2102 $married_1$ +    0.1792 $chronic_{1-2} $ +  0.2731 $chronic_{3-8} $ - 0.2478 $adl_{1-5}$ + 0.1153  $retire_1$ + 0.4875 $hhincome_{(3.59,7.18]}$ +  0.1343 $hstatusg1$ + $\varepsilon$
+\end{center}
+
+&nbsp; 
+
+Les valeurs des coefficients des régréssions logit et probit sont de mêmes signes mais sont différents car les spécifications ne sont pas les mêmes. Cependant, nous pouvons retrouver, approximativement, les valeurs estimées du modèle Logit en multipliant chacun des coefficients des variables explicatives du modèle Probit par la constante $\frac{\pi}{\sqrt{3}}= 1.81288$ .
+
+\newpage
+
+```{r}
+comp<-rbind(coefficients(m.logit2),coefficients(laicprob)*(3.14/sqrt(3)))
+
+rownames(comp)<-c("Logit","Probit * 1.81288")
+
+kable(comp[,c(2:6)],"latex",align = "c",caption = "Comparaison Logit et Probit transformé") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+
+kable(comp[,c(7:11)],"latex",align = "c",caption = "Comparaison Logit et Probit transformé") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)
+
+```
+
+Il apparaît que les résultats des modèles probit et logit sont généralement similaires que ce soit en termes de probabilité ou en termes d'estimation des coefficients $\beta$ si l'on prend en compte les problèmes de normalisation. En raison de l'étroite similitude des deux distributions, il est difficile de les distinguer statistiquement à moins que l'on ne dispose d'un nombre extrêmement élevé d'observations. Ainsi, peu importe que l'on utilise le modèle probit ou le modèle logit. 
+
+Cependant, pour faciliter les interprétations nous allons, dans la suite de notre étude, nous focaliser sur le modèle Logit.
+
+
+# Interpretation
+
+Rappellons que le modèle s'écrit : 
+
+\begin{center}
+$Logit(ins)$ = -0.9078 1 $hisp_1$ +  0.5036 $educyear_{12}$ +  0.5732 $educyear_{13-17}$ +  0.3460 $married_1$ +    0.2971 $chronic_{1-2} $ +  0.4507 $chronic_{3-8} $ - 0.4059 $adl_{1-5}$ + 0.1885  $retire_1$ + 0.7893 $hhincome_{(3.59,7.18]}$ +  0.2141 $hstatusg1$ + $\varepsilon$
+\end{center}
+
+L'estimation d'un coefficient positif est associée à une augmentation de la probabilité d'avoir une complémentaire santé. 
+
+Nous pouvons donc déduire, grâce aux signes de nos coéfficients : 
+
+- Le fait qu'un individu soit hispanique diminue la probabilité qu'il ait souscrit une assurance complémentaire ;
+
+- Le nombre d'années d'éducation agit positivement sur la probabilité d'avoir souscrit une assurance complémentaire, plus les individus sont éduqués plus la probabilité qu'ils aient souscris une assurance complémentaire augmente ;
+
+- Être marié agit positivement sur la probabilité de souscrire à une assurance complémentaire;
+
+- Le nombre de maladies chroniques agit lui aussi positivement, plus les individus ont des maladies chroniques plus la probabilité qu'ils souscrivent une assurance complémentaire augmente ;
+
+- Avoir des contraintes liés à la vie quotidienne semble agir négativement sur la probabilité de souscrire une assurance complémentaire ;
+
+- Être retraité agit positivement sur la probabilité d'avoir une complémentaire santé ;
+
+- Le revenu semble lui aussi agir positivement, plus les individus ont des revenus élevés plus la probabilité qu'ils souscrivent une assurance complémentaire  est grande;
+
+- La fait d'être en bonne santé est un facteur positif au fait de souscrire une assurance complémentaire ;
+
+&nbsp; 
+
+Intéréssons nous maintenant à l'effet de ses différentes variables. Pour ce faire nous allons calculer les **oods ratios ** : "rapport de côtes".
+
+```{r,message=F,warning=F}
+odd<-odds.ratio(m.logit2)
+
+kable(odd,"latex",align = "c",caption = "OODS-RATIO") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F)
+```
+
+Un oods-ratio de 1 indique l'absence d'effets. On note qu'aucuns de nos intervalles de confiance ne contient la valeur 1 et que toutes les *p-value* sont inferieures à 0.05, ce qui signifie que tous les coefficients ont un effet.
+
+&nbsp;
+
+\begin{center}
+\textbf{hisp}
+\end{center}
+Un **OR** à 0.4034272 signifie que la probabilité d'avoir une complémentaire santé est 0.4034272 fois plus faible chez les individus qui sont hispanique. Ce qui signifie simplement que les hispanique ont 60% de chance en moins davoir une complémentaire santé par rapport aux individus des autres races. 
+
+**Remarque : ** En réalité il ne s'agit pas vraiment de la probabilité, mais plutôt de la chance ou de l'espérance de gain. Si l'étude portait sur le tirage du loto par exemple on aurait plutôt dit : l'esperance de gain est 0.4034272 fois plus faible chez les individus qui sont hispanique ou dans ce cas précis on aurait simplement pût dire: les hispaniques ont 0.4034272 fois moins de chance d'avoir une complémentaire santé ... Cependant parler de *"chance d'avoir une complémentaire santé"* me semble incohérent étant donné que l'on ne raisonne pas en terme de gain et de perte. C'est donc le terme *probabilité* qui sera utilisé. 
+
+```{r,include=F}
+(0.403422-1)*100
+```
+
+&nbsp; 
+
+\begin{center}
+\textbf{educyear}
+\end{center}
+ 
+
+La classe de référence de la variable  *educyear* étant $educyear_{0-11}$ ;  Le **OR** à 1.6547258 de la classe $educyear_{12}$ signifie que la probabilité d'avoir une complémentaire santé est 1.6547258 fois plus élevé chez les individus ayant 12 ans d'études que chez les individus ayant moins de 12 ans d'études, soit 65,4% de plus.  
+
+Aussi, le **OR** à  1.7740103 de la classe $educyear_{13-17}$ signifie que la probabilité d'avoir une complémentaire santé est 1.7740103 fois plus élevé chez les individus ayant entre 13 et 17 ans d'études que chez les individus ayant moins de 12 ans d'études, soit 77.4% e plus.
+
+&nbsp; 
+
+\begin{center}
+\textbf{married}
+\end{center}
+
+Un **OR** à 1.4134316 signifie que la probabilité d'avoir une complémentaire santé est 1.4134316 fois plus forte chez les individus qui sont marriés par rapport aux individus qui ne le sont pas. Ce qui signifie simplement que les personnes marriés ont 41,3% chance en plus d'avoir une complémentaire santé par rapport aux individus qui ne le sont pas.
+
+&nbsp; 
+
+\begin{center}
+\textbf{chronic}
+\end{center}
+
+
+La classe de référence de la variable *chronic* étant $chronic_{0}$ ;  Le **OR** à 1.3458906 de la classe $chronic_{1-2}$ signifie que la probabilité d'avoir une complémentaire santé est 1.3458906 fois plus élevé chez les individus ayant entre une et deux maladies chroniques, que chez les individus n'ayant aucunes maladies chroniques. Pour le dire simplement, les individus ayant entre une et deux maladies chroniques ont 34,5% de chance en plus d'avoir une complémentaire santé par rapport aux individus n'ayant pas de maladies chroniques.  
+
+Aussi, le **OR** à  1.5693516 de la classe $chronic_{3-8}$ signifie que la probabilité d'avoir une complémentaire santé est 1.5693516 fois plus élevé chez les individus ayant entre trois et huit maladies chroniques, que chez les individus n'ayant aucunes maladies chroniques, soit 57% de chance en plus d'avoir une complémentaire santé que ceux qui n'ont pas de maladies chroniques. 
+
+&nbsp; 
+
+\begin{center}
+\textbf{adl}
+\end{center}
+
+La classe de référence de la variable *adl* étant $adl_{0}$ ; Le **OR** à 0.6663669 de la classe $adl_{1-5}$ signifie que la probabilité d'avoir une complémentaire santé est 0.6663669 fois plus faible chez les individus ayant des limitations par rapport aux individus n'ayant aucunes limitations. Un individu ayant des limitations à donc 33.36% chance en moins d'avoir une complémentaire santé.  
+
+&nbsp; 
+
+\begin{center}
+\textbf{retire}
+\end{center}
+
+Le **OR** à 1.2074143 de la variable $retire$ signifie que la probabilité d'avoir une complémentaire santé est 1.2074143 fois plus élevé chez les individus qui sont retraités par rapport à ceux qui sont actifs. Un individu à la retraite aura 20% de chance en plus d'avoir une complémentaire santé, par rapport à un individu actif.
+
+&nbsp; 
+
+\begin{center}
+\textbf{hhincome}
+\end{center}
+
+La classe de référence de la variable *hhincome* étant $hhincome_{0-3,59}$ ;  Le **OR** à 2.2019113 de la classe $hhincome_{3.59-7.18}$ signifie que la probabilité d'avoir une complémentaire santé est 2.2019113 fois plus élevé chez les individus ayant un revenu en logaritme compris entre 3.59 et 7.18, que chez les individus ayant un revenu plus faible. 
+
+Pour le dire simplement, les individus ayant un revenu superieur à la moyenne ont 120% de chance en plus d'avoir une complémentaire santé par rapport à ceux qui ont un revenu inférieur à la moyenne. 
+
+&nbsp; 
+
+\begin{center}
+\textbf{hstatug}
+\end{center}
+
+Le **OR** à 1.2387232 de la variable $retire$ signifie que la probabilité d'avoir une complémentaire santé est 1.2387232 fois plus élevé chez les individus qui sont en bonne santé par rapport à ceux qui ne le sont pas. Un individu en bonne santé aura 24% de chance en plus d'avoir une complémentaire santé, par rapport à un individu en mauvaise santé.
+
+
+&nbsp; 
+
+
+#  Marginal effects
+
+Un des principaux problème avec le rapport de côtes est que de nombreuses paires de résultats donnent exactement le même rapport de côtes. Au lieu des rapports de côtes, il serait intérréssant de calculer les effets marginaux. Ces derniers sont plus simples à interpréter et à comprendre car ils donnent une mesure directe : la différence moyenne de probabilité en termes de points de pourcentage du les classes. Ainsi, les effets marginaux fournissent une statistique bien meilleure et plus informative par rapport aux rapports de côtes.
+
+```{r,include=F}
+library(margins)
+margins(m.logit2,type="response")
+```
+
+&nbsp;
+
+```{r}
+marg<-rbind(c(-0.1731724, 0.1057364, 0.1212139, 0.0724989, 0.06018765 ))
+colnames(marg)<-c("hisp1","educyear12","educyear13-17","married","chronic1-2")
+kable(marg,"latex",align = "c",caption = "Effets marginaux") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F)
+
+
+```
+
+&nbsp;
+
+
+
+\begin{center}
+\textbf{hisp}
+\end{center}
+ 
+L'effet marginale de la classe *hisp1* est de -0.1731724 ce qui signifie que la différence moyenne de probabilité  entre les personnes assurés qui ne sont pas hispaniques et les personnes assuré qui le sont est de -17.3 points de pourcentage. 
+
+&nbsp; 
+
+\begin{center}
+\textbf{educyear}
+\end{center}
+
+L'effet marginale de la classe $educyear_{12}$ est de 0.1057364 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui ont de 12 ans d'études et les personnes assurés qui ont moins 12 ans d'études est de 10.5 points de pourcentage. 
+
+L'effet marginale de la classe $educyear_{13-17}$ est de 0.1212139 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui ont plus de 12 ans d'étude et les personnes assurés qui ont moins de 12 ans d'étude est de 12 points de pourcentage.
+ 
+&nbsp; 
+
+\begin{center}
+\textbf{married}
+\end{center}
+
+L'effet marginale de la classe *married1* est de 0.0724989 ce qui signifie que la différence moyenne de probabilité entre les personnes assuré qui sont marriés et les personnes assuré qui ne le sont pas est de 7.2 points de pourcentage.
+
+```{r}
+marg1<-rbind(c(0.09267182, -0.08354638, 0.03958705, 0.1757659, 0.04495921))
+
+colnames(marg1)<-c("chronic3-8","adl1-5","retire","hhincome.d(3.59,7.18]","hstatusg1")
+
+kable(marg1,"latex",align = "c",caption = "Effets marginaux") %>%
+kable_styling(latex_options =c("striped","hold_position"),full_width = F)
+```
+
+&nbsp; 
+
+\begin{center}
+\textbf{chronic}
+\end{center}
+
+L'effet marginale de la classe $chronic_{1-2}$ est de 0.0601876 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui ont 1 à 2 maladie chroniques  et les personnes assurés qui n'en ont aucune est de 6 points de pourcentage . 
+
+L'effet marginale de la classe $chronic_{3-8}$ est de 0.0926718 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui ont 3 à 8 maladies chroniques  et les personnes assurés qui n'en ont aucune est de 9.2 points de pourcentage. 
+
+&nbsp; 
+
+\begin{center}
+\textbf{adl}
+\end{center}
+
+L'effet marginale de la classe $adl_{1-5}$ est de -0.0835464 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui ont des limitations et ceux qui n'en ont pas chronique est de -8.3 points de pourcentage.   
+
+&nbsp; 
+
+\begin{center}
+\textbf{retire}
+\end{center}
+
+L'effet marginale de la classe *retire1* est de 0.039587 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui n'ont sont retraités avec ceuxx qui ne le sont pas est de 4 points de pourcentage.  
+&nbsp; 
+
+\begin{center}
+\textbf{hhincome}
+\end{center}
+
+L'effet marginale de la classe $hhincome_{(3.59,7.18]}$ est de 0.1757659 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui ont un revenu en logarithme superieur à la moyenne et les personnes assurés qui ont un revenu inferieur à la moyenne est de 17.6 points de pourcentage.  
+
+&nbsp; 
+
+\begin{center}
+\textbf{hstatug}
+\end{center}
+
+L'effet marginale de la classe *hstatug* est de 0.0449592 ce qui signifie que la différence moyenne de probabilité entre les personnes assurés qui sont en bonne santé et les personnes assurés qui ne le sont pas est de 4.4 points de pourcentage. 
+
+
+# Discussion
+
+
+Commençons par la variable **hisp**: s'agissant d'une variable de type signalétique, il n'y a pas grand chose à dire. Ils ressort simplement que les hispaniques ont moins tendance à souscrire une assurance que les autres races. Sur l'ensemble de notre base de données seuls 233 individus sont hispaniques ce qui représente à peine 6 % des individus et parmi eux seuls 35 individus ont une complémentaire santé. Étant donné le faible nombre d'individus concernés on aurait pu pensé qu'il faudrait être prudent et éviter de faire des généralités mais ce faible effectif s'explique simplement par le fait que **Medicare** est une institution dont les services sont principalement destinées aux américains. 
+
+Concernant la variable **educyear** : la séparer en 3 modalités était une très bonne idée. Cela nous a permis d'observer l'influence de ses diverses modalités sur le fait de souscrire à une complémenatire santé. Les différents résultats nous ont permis de conclure que le nombre d'années d'éducation avait un impact significatif sur la probabilité de souscrire à une complémenatire santé. On peut supposé sans trop s'avancer que le nombre d'années d'éducation est corrélé d'une manière ou d'une autre avec la variable salaire : **hhincome**, qui elle aussi contribue de manière significative et augmente la probabilité d'avoir une complémentaire santé à mesure qu'elle augmente. Cette *pseudo-corrélation* pourrait expliquer ces effets marginaux très élevés.  
+
+En ce qui concerne les variables **married** et **retire**: les résultats obtenus précédemment nous ont permis de déduire que le fait d'etre marrié et d'être retraité augmentait la probabilité de souscire à une complémentaire santé. 
+
+En ce qui concerne les maladies chroniques et le nombre de limitations : **Medicare** permet de couvrir seulement certaines maladies chroniques, ce qui implique trivialement qu'un grand nombre de maladies chroniques augmentent la probabilité de recourir à une complémentaire santé. Sachant que **Medicare** ne s'occupe pas des soins de longues durées, cette relation est plus qu'évidente.  
+Avoir des limitations liés à la vie quotidienne semble diminuer la probabilité de recourir à une complémentaire. Ceçi s'explique certainement par le fait que lorsqu'on à une assurance santé **Medicare** on peut etre éligible au programme appelée **Medicaid** : il s'agit d'une autre assurance santé conçu spécialement pour les personnes en situation de handicap et qui ne nécessite pas le recours à une assurance complémenataire.
+
+
+# Limitations
+
+Les résultats obtenus précedemment nous permettent de conclure que certaines des caractéristiques qui induisent une faible probabilité d'avoir une complémentaire santé sont les suivantes : avoir beaucoup de handicap, ne pas avoir fait de longues études, être pauvre (avoir des revenus en dessous de la moyenne), être célibataire, être en mauvaise santé. 
+
+Ces quelques caractéristiques suffisent pour montrer les limites de la complémentaire santé **Medigap** et plus généralement du systême de santé américain. Ce sont ceux qui en ont  le plus besoin qui ont la probabilité la plus faible d'y souscrire. C'est un systême qui est censé aider à couvrir la différence de coût qui n'est pas couverte par l'assurance maladie et donc aider les personnes dans le besoin mais on constate que ce systême bénéficie aux plus riches alors que : à maladies et limitations égales, ce sont les pauvres qui en ont  le plus besoin. 
+
+
+\newpage 
+
+
+\newpage
+
+# Annexe
+
+## AIC modèle général :
+```{r}
+step(lm,method="both")
+```
+
+
+## AIC Modèle général transformé : 
+
+```{r}
+step(lm3,method="both")
+```
+
+## Les autres transformations 
+
+On sépare hhincome en trois classes.
+
+```{r}
+
+Breakshhk = c(min(data$hhincome),2.393388,(2.393388+2.393388), max(data$hhincome))
+
+hhincome.d = cut(data$hhincome, breaks = Breakshhk , include.lowest = TRUE)
+
+hh1<-xtabs(~ins + hhincome.d, data = data)
+
+kable(hh1,align = "c",caption = "Répartition hhincome ") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("ins", "hhincome" = 2))
+```
+
+Age en classe de 10 ans. 
+```{r}
+
+Breakshha = c(min(appren$age),60,70, max(appren$age))
+
+agee.d = cut(appren$age, breaks = Breakshha, include.lowest = TRUE)
+
+hh1<-xtabs(~ins + agee.d, data = appren)
+
+kable(hh1,align = "c",caption = "Répartition hhincome ") %>%
+kable_styling(latex_options=c("striped","hold_position"),full_width = F)%>%
+add_header_above(c("ins", "hhincome" = 2))
+```
+
+Régression obtenu
+```{r}
+tra<-glm(ins~agee.d+ hisp+white+ female + educyear+married+chronic+adl+retire+sretire+ hhincome.d+ hstatusg, data=appren, family=binomial(link=logit))
+summary(tra)
+```
+
